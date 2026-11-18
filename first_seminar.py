@@ -59,3 +59,19 @@ class ColorTranslator:
         return solution
 
 
+    def inverse_zigzag(self, zigzag):
+            matrix = np.zeros((8,8))
+            for i in range(7):
+                for j in range(7):
+                    sum = i+j
+                    if(sum % 2 == 0):
+    
+                        # add at beginning
+                        matrix[i][j] = zigzag[sum]
+                    else:
+                        matrix[7-i][7-j] = zigzag[sum]
+                   
+            return matrix
+    
+    
+
