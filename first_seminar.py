@@ -1,14 +1,15 @@
 import numpy as np
+import subprocess
 
 class ColorTranslator:
-    def __init__(self, picture):
+    def __init__(self, picture = None):
         self.picture = picture
 
     def rgb_to_yuv(self):
         #Extract color channels
-        R = self.picture[:, :, 0]
-        G = self.picture[:, :, 1]
-        B = self.picture[:, :, 2]
+        R = self.picture[:, :, 0].astype(float)
+        G = self.picture[:, :, 1].astype(float)
+        B = self.picture[:, :, 2].astype(float)
 
 
         #Calculate YUB given RGB
@@ -18,13 +19,13 @@ class ColorTranslator:
 
         picture_yuv = np.dstack((Y, U,V))
 
-        return picture_yuv
+        return np.clip(np.round(picture_yuv), 0, 255).astype(np.uint8)
 
     def yuv_to_rgb(self):
         #Extract color channels
-        Y = self.picture[:, :, 0]
-        U = self.picture[:, :, 1]
-        V = self.picture[:, :, 2]
+        Y = self.picture[:, :, 0].astype(float)
+        U = self.picture[:, :, 1].astype(float)
+        V = self.picture[:, :, 2].astype(float)
 
 
         #Calculate YUB given RGB
@@ -34,11 +35,11 @@ class ColorTranslator:
 
         picture_rgb = np.dstack((R, G, B))
 
-        return picture_rgb
+        return np.clip(np.round(picture_rgb), 0, 255).astype(np.uint8)
 
-    def clip_to_integer(self):
-        return np.clip(self.picture, 0, 255).astype(np.uint8)
+    def resize(self, scale, img_path, exit_path):
+        txt = f'ffmpeg -y -i {img_path} -vf "scale=iw/{scale}:ih/{scale}" "{exit_path}/image_scaled_by_{scale}.jpg"'
+
+        subprocess.run(txt, check = True, shell = True)
 
 
-
-        
