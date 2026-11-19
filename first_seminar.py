@@ -1,6 +1,13 @@
 import numpy as np
 import subprocess
 
+
+'''
+Hay que acordarse de añadir comentarios y responder las preguntas al final.
+Y hacer los bonuses si sobra tiempo.
+'''
+
+
 class ColorTranslator:
     def __init__(self, picture = None):
         self.picture = picture
@@ -49,29 +56,57 @@ class ColorTranslator:
             for j in range(columns):
                 sum = i+j
                 if(sum % 2 == 0):
-
                     # add at beginning
                     solution[sum].insert(0, matrix[i][j])
                 else:
-
                     # add at end of the list
                     solution[sum].append(matrix[i][j])
         return solution
 
-
     def inverse_zigzag(self, zigzag):
-            matrix = np.zeros((8,8))
-            for i in range(7):
-                for j in range(7):
-                    sum = i+j
-                    if(sum % 2 == 0):
-    
-                        # add at beginning
-                        matrix[i][j] = zigzag[sum]
-                    else:
-                        matrix[7-i][7-j] = zigzag[sum]
-                   
-            return matrix
-    
-    
+        matrix = np.zeros((8,8))
+        # keep track of what diagonal we are on and in what direction we are going
+        direction = 1 # 0 is going down a diagonal and 1 is up a diagonal
+        diagonal_num = 0
+        
+        while len(zigzag) != 0: # while the zigzag array is not empty
+            # fill the matrix values of the current diagonal
+            for i in range(8):
+                for j in range(8):
+                    if i+j == diagonal_num: # if the diagonal corresponds to the one we are currently on
+                        if direction == 0: # downwards
+                            matrix[i][j] = zigzag.pop(0) # fill from the top of the diagonal
+                        elif direction == 1: # upwards
+                            matrix[j][i] = zigzag.pop(0) # start filling from the bottom of the diagonal
 
+            diagonal_num += 1 # move to the next diagonal
+            direction = 1 - direction # change directions
+            
+        return matrix
+
+    def RLE(self, zigzag):
+        rle = [] # output will be each value followed by its count e.g. [3, 2, 1, 4] means 331111
+        count = 1 # keep track of how many times a value is repeated
+
+        for i in range(1, len(zigzag)):
+            if zigzag[i] == zigzag[i - 1]: # if there is a repetition, increment the count
+                count += 1
+            else: # otherwise, add the value with its count to the output array and set the count back to 1
+                rle.append(zigzag[i-1])
+                rle.append(count)
+                count = 1
+
+        rle.append(zigzag[-1])
+        rle.append(count)
+
+        return rle
+
+    def RLE_decoder(self, rle):
+        decoded_rle = np.array([])
+        for i in range(1, len(rle), 2): # increase by 2 so counts are not confused with values (since it goes: value, count, value, count...)
+            value = rle[i-1]
+            count = rle[i]
+            values = [value]*count 
+            decoded_rle = np.append(decoded_rle, values)
+
+        return decoded_rle
