@@ -5,7 +5,26 @@ import subprocess
 '''
 Hay que acordarse de añadir comentarios y responder las preguntas al final.
 Y hacer los bonuses si sobra tiempo.
+Hacer huffman coding para el bonus de la pregunta 7.
+
+TO DO:
+- 3 -> responder pregunta
+- 4 -> punto final
+- 6: inverse DCT, comparing with different quality factors
+- 7 -> bonus huffman (find online)
+- 8, 9 y 10
 '''
+
+QY = np.array([
+            [16, 11, 10, 16, 24,  40,  51,  61],
+            [12, 12, 14, 19, 26,  58,  60,  55],
+            [14, 13, 16, 24, 40,  57,  69,  56],
+            [14, 17, 22, 29, 51,  87,  80,  62],
+            [18, 22, 37, 56, 68, 109, 103,  77],
+            [24, 35, 55, 64, 81, 104, 113,  92],
+            [49, 64, 78, 87, 103, 121, 120, 101],
+            [72, 92, 95, 98, 112, 100, 103,  99]
+        ])
 
 
 class ColorTranslator:
@@ -110,3 +129,45 @@ class ColorTranslator:
             decoded_rle = np.append(decoded_rle, values)
 
         return decoded_rle
+
+    def DCT(self, matrix):
+        DCT = np.zeros(8,8)
+        for u in range(7):
+            if u == 0:
+                a = np.sqrt(1/8)
+            else:
+                a = np.sqrt(2/8)
+            for v in range(7):
+                if v == 0:
+                    b = np.sqrt(1/8)
+                else:
+                    b = np.sqrt(2/8)
+                for x in range(7):
+                    for y in range(7):
+                        DCT[u][v] = a*b*matrix[x][y]*np.cos((np.pi/8)*(x+0.5)*u)*np.cos((np.pi/8)*(y+0.5)*v)
+        return DCT
+
+    def quantization(self, DCT, qual_factor):
+        DCT_q = np.zeros(8,8)
+
+        if qual_factor < 50:
+            S = 5000/qual_factor
+        else:
+            S = 200 - 2*qual_factor
+
+        q_scaled =  np.clip(np.round(QY*(S/100)), 1, 255)
+        DCT_q = np.rount(DCT/q_scaled)
+        return DCT_q
+
+    def dequantize(self, DCT_q, qual_factor):
+        DCT = np.zeros(8,8)
+        
+        if qual_factor < 50:
+            S = 5000/qual_factor
+        else:
+            S = 200 - 2*qual_factor
+
+        q_scaled =  np.clip(np.round(QY*(S/100)), 1, 255)
+        DCT = np.rount(DCT_q*q_scaled)
+        return DCT
+
