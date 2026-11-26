@@ -8,3 +8,8 @@ img = np.asarray(Image.open(path+"amazonas.jpg"))
 
 resize= ColorTranslator()
 resize.resize(8, path+"amazonas.jpg", path)
+
+
+'''
+Which scaling algorithm does FFmpeg use by default? Try another one with -sws_flags and compare
+'''

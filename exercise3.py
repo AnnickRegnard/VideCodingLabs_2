@@ -52,5 +52,11 @@ plt.tight_layout()
 plt.show()
 
 
+'''
+Experiment: blur only the chroma (U, V) heavily. Then blur only the luma (Y). 
+Which one do you notice?
 
+Hint: FFmpeg extractplanes / mergeplanes, or do it in Python
+Explain in 2-3 lines why JPEG and every video codec do this
+'''
 

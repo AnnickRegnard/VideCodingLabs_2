@@ -6,14 +6,11 @@ import scipy
 
 '''
 Hay que acordarse de añadir comentarios y responder las preguntas al final.
-Y hacer los bonuses si sobra tiempo.
-Hacer huffman coding para el bonus de la pregunta 7.
 
 TO DO:
 - 3 -> responder pregunta
 - 4 -> punto final
-- 6: inverse DCT, comparing with different quality factors
-- 8, 9 y 10
+- 10
 '''
 
 QY = np.array([
@@ -195,7 +192,7 @@ class ColorTranslator:
         return values, freq
    
 
-
+# --- Huffman coding ---
 class Node:
     def __init__(self, symbol=None, frequency=None):
         self.symbol = symbol

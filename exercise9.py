@@ -144,11 +144,23 @@ if __name__ == "__main__":
     rec_error = np.max(np.abs(gray_img[:reconstructed.shape[0], :reconstructed.shape[1]].astype(int) - reconstructed.astype(int)))
     print(f"DWT Perfect Reconstruction max pixel error: {rec_error}")
 
-    # Part 2: JPEG vs JPEG2000 FFmpeg Battle (passing None auto-matches JPEG2000 size to JPEG size)
+    # Part 2: JPEG vs JPEG2000 FFmpeg Battle
     run_battle(image_path, jpeg_q=31, j2k_compression_ratio=24)
 
 
 '''
-If JPEG2000 wins… why is the whole world still using JPEG?Despite JPEG2000's superior rate-distortion performance, progressive decoding, and absence of blocking artifacts, standard JPEG remains dominant due to ecosystem inertia, computational complexity, and early patent concerns. When JPEG2000 was standardized in 2000, JPEG was already universally supported across every web browser, operating system, and digital camera, creating a massive chicken-and-egg adoption barrier. Moreover, JPEG2000's arithmetic coder (EBCOT) and full-frame DWT require significantly more CPU/memory resources and are much harder to parallelize in low-power hardware than JPEG's simple $8\times8$ block-based DCT. Combined with initial fears over patent licensing and the lack of native support in major web browsers (historically only Safari supported it), JPEG2000 remained confined to niche professional industries—such as digital cinema (DCP), medical imaging (DICOM), and archival preservation—while consumer devices stuck with JPEG until modern replacements like WebP and AVIF arrived.
+Compare PSNR / SSIM (FFmpeg psnr and ssim filters) and the artifacts: blocking vs ringing/blur. Screenshots!
+One paragraph: if JPEG2000 wins… why is the whole world still using JPEG?
+
+
+If JPEG2000 wins… why is the whole world still using JPEG?Despite JPEG2000's superior rate-distortion performance, 
+progressive decoding, and absence of blocking artifacts, standard JPEG remains dominant due to ecosystem inertia, 
+computational complexity, and early patent concerns. When JPEG2000 was standardized in 2000, JPEG was already universally 
+supported across every web browser, operating system, and digital camera, creating a massive chicken-and-egg adoption barrier. 
+Moreover, JPEG2000's arithmetic coder (EBCOT) and full-frame DWT require significantly more CPU/memory resources and are much 
+harder to parallelize in low-power hardware than JPEG's simple $8\times8$ block-based DCT. Combined with initial fears over 
+patent licensing and the lack of native support in major web browsers (historically only Safari supported it), JPEG2000 remained 
+confined to niche professional industries—such as digital cinema (DCP), medical imaging (DICOM), and archival preservation—while 
+consumer devices stuck with JPEG until modern replacements like WebP and AVIF arrived.
 
 '''

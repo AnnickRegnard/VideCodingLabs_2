@@ -140,6 +140,26 @@ if __name__ == "__main__":
 
         print(f"{qf:<5} | {rle_symbols:<22} | {psnr_mini:>11.2f} dB | {ff_bytes:<14} | {psnr_ff:>9.2f} dB")
 
+    # 3. Hardest B/W compression with FFmpeg (-q:v 31 + grayscale filter)
+    hardest_bw_out = "ffmpeg_hardest_bw.jpg"
+    cmd_hardest = (
+        f'ffmpeg -y -loglevel error -i "{image_path}" '
+        f'-vf format=gray -q:v 31 "{hardest_bw_out}"'
+    )
+    subprocess.run(cmd_hardest, shell=True, check=True)
+
+    hardest_bytes = os.path.getsize(hardest_bw_out)
+    hardest_img = np.array(Image.open(hardest_bw_out).convert("L"))
+    hardest_psnr = compute_psnr(y_channel, hardest_img)
+
+    print("-" * 80)
+    print(f"FFmpeg Hardest B/W (-q:v 31): {hardest_bytes} bytes (saved to {hardest_bw_out}) | PSNR: {hardest_psnr:.2f} dB")
+
     # Clean up temporary raw Y image
     if os.path.exists(raw_y_path):
         os.remove(raw_y_path)
+
+
+'''
+Use FFmpeg to get the b/w version with the hardest compression you can. Comment the results.
+'''

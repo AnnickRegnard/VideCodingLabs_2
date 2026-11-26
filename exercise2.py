@@ -34,3 +34,7 @@ plt.tight_layout()
 plt.show()
 
 
+'''
+Round trip: RGB → YUV → RGB. Do you get exactly the same values? If not, why not?
+'''
+

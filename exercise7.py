@@ -18,20 +18,17 @@ zigzagged_recovered = rle_encoder.RLE_decoder(rle)
 
 print("RLE decoder output: ", zigzagged_recovered)
 
-# 2. Calcular frecuencias desde el RLE
 values, freq = rle_encoder.RLE_frequencies(rle)
 print("\nValores únicos:", values)
 print("Frecuencias:", freq)
 
-# 3. Construir árbol y códigos de Huffman
 root = build_huffman_tree(values, freq)
 huffman_codes = generate_huffman_codes(root)
 
-print("\nCódigos de Huffman generados:")
+print("\nHuffman codes generated:")
 for val, code in huffman_codes.items():
-    print(f"  Valor {val} -> {code}")
+    print(f"  Value {val} -> {code}")
 
-# 4. Codificar la secuencia original usando los códigos de Huffman
 encoded_bitstream = "".join(huffman_codes[val] for val in zigzagged)
-print("\nSecuencia codificada (bits):", encoded_bitstream)
+print("\nCoded sequence (bits):", encoded_bitstream)
 

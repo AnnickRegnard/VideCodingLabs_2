@@ -3,6 +3,4 @@ scipy
 pillow
 matplotlib
 humanize
-subprocess
-heapq
 PyWavelets
