@@ -1,5 +1,7 @@
 import numpy as np
 import subprocess
+import heapq
+import scipy
 
 
 '''
@@ -11,7 +13,6 @@ TO DO:
 - 3 -> responder pregunta
 - 4 -> punto final
 - 6: inverse DCT, comparing with different quality factors
-- 7 -> bonus huffman (find online)
 - 8, 9 y 10
 '''
 
@@ -131,24 +132,31 @@ class ColorTranslator:
         return decoded_rle
 
     def DCT(self, matrix):
-        DCT = np.zeros(8,8)
-        for u in range(7):
+        matrix = matrix.astype(float) - 128.0
+        DCT = np.zeros((8,8))
+        for u in range(8):
             if u == 0:
                 a = np.sqrt(1/8)
             else:
                 a = np.sqrt(2/8)
-            for v in range(7):
+            for v in range(8):
                 if v == 0:
                     b = np.sqrt(1/8)
                 else:
                     b = np.sqrt(2/8)
-                for x in range(7):
-                    for y in range(7):
-                        DCT[u][v] = a*b*matrix[x][y]*np.cos((np.pi/8)*(x+0.5)*u)*np.cos((np.pi/8)*(y+0.5)*v)
+                for x in range(8):
+                    for y in range(8):
+                        DCT[u][v] += a*b*matrix[x][y]*np.cos((np.pi/8)*(x+0.5)*u)*np.cos((np.pi/8)*(y+0.5)*v)
         return DCT
 
+    def inv_DCT(self, matrix):
+        inv_DCT = np.zeros((8,8))
+
+        inv_DCT = scipy.fft.idctn(matrix, norm='ortho') + 128.0
+        return inv_DCT
+
     def quantization(self, DCT, qual_factor):
-        DCT_q = np.zeros(8,8)
+        DCT_q = np.zeros((8,8))
 
         if qual_factor < 50:
             S = 5000/qual_factor
@@ -156,11 +164,11 @@ class ColorTranslator:
             S = 200 - 2*qual_factor
 
         q_scaled =  np.clip(np.round(QY*(S/100)), 1, 255)
-        DCT_q = np.rount(DCT/q_scaled)
+        DCT_q = np.round(DCT/q_scaled)
         return DCT_q
 
     def dequantize(self, DCT_q, qual_factor):
-        DCT = np.zeros(8,8)
+        DCT = np.zeros((8,8))
         
         if qual_factor < 50:
             S = 5000/qual_factor
@@ -168,6 +176,62 @@ class ColorTranslator:
             S = 200 - 2*qual_factor
 
         q_scaled =  np.clip(np.round(QY*(S/100)), 1, 255)
-        DCT = np.rount(DCT_q*q_scaled)
+        DCT = np.round(DCT_q*q_scaled)
         return DCT
 
+
+    def RLE_frequencies(self, rle):
+        counts_dict = {}
+        
+        for i in range(1, len(rle), 2):  
+            value = rle[i - 1]
+            count = rle[i]
+            
+            counts_dict[value] = counts_dict.get(value, 0) + count
+
+        values = np.array(list(counts_dict.keys()))
+        freq = np.array(list(counts_dict.values()))
+
+        return values, freq
+   
+
+
+class Node:
+    def __init__(self, symbol=None, frequency=None):
+        self.symbol = symbol
+        self.frequency = frequency
+        self.left = None
+        self.right = None
+
+    def __lt__(self, other):
+        return self.frequency < other.frequency
+
+def build_huffman_tree(chars, freq):
+  
+    # Create a priority queue of nodes
+    priority_queue = [Node(char, f) for char, f in zip(chars, freq)]
+    heapq.heapify(priority_queue)
+
+    # Build the Huffman tree
+    while len(priority_queue) > 1:
+        left_child = heapq.heappop(priority_queue)
+        right_child = heapq.heappop(priority_queue)
+        merged_node = Node(frequency=left_child.frequency + right_child.frequency)
+        merged_node.left = left_child
+        merged_node.right = right_child
+        heapq.heappush(priority_queue, merged_node)
+
+    return priority_queue[0]
+
+def generate_huffman_codes(node, code="", huffman_codes=None):
+    if huffman_codes is None:
+        huffman_codes = {}
+
+    if node is not None:
+        if node.symbol is not None:
+            huffman_codes[node.symbol] = code
+        generate_huffman_codes(node.left, code + "0", huffman_codes)
+        generate_huffman_codes(node.right, code + "1", huffman_codes)
+
+    return huffman_codes
+    
